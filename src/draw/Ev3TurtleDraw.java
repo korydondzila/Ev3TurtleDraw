@@ -11,14 +11,12 @@
 
 package draw;
 
-import lejos.hardware.ev3.EV3;
 import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.Port;
 import lejos.robotics.RegulatedMotor;
-import lejos.robotics.chassis.WheeledChassis;
 import lejos.robotics.geometry.Point;
 import lejos.utility.Delay;
 
@@ -69,7 +67,7 @@ public class Ev3TurtleDraw implements AutoCloseable
 		this.direction = new Point( 1, 0 );
 		this.leftWheel = new EV3LargeRegulatedMotor( leftWheelPort );
 		this.rightWheel = new EV3LargeRegulatedMotor( rightWheelPort );
-		this.pen = new EV3LargeRegulatedMotor( pen );
+		this.pen = new EV3MediumRegulatedMotor( pen );
 		this.leftWheel.setSpeed( 90 );
 		this.rightWheel.setSpeed( 90 );
 		this.pen.setSpeed( 360 );
@@ -107,7 +105,7 @@ public class Ev3TurtleDraw implements AutoCloseable
 	 * Rotates the car by degrees.
 	 * @param degrees Degrees to rotate by.
 	 */
-	public void rotate(float degrees)
+	public void rotate(double degrees)
 	{
 		setDirection( degrees );
 		float wheelDegrees = Math.round( degrees * baseToWheelRatio );
@@ -148,10 +146,100 @@ public class Ev3TurtleDraw implements AutoCloseable
 	}
 	
 	/**
+	 * Moves the car forward by the specified distance in cm.
+	 * @param distance The distance in cm.
+	 */
+	public void moveForward(double distance)
+	{
+		setPosition( distance );
+		int wheelDegrees = (int)Math.round( distance / wheelCircumference * 360.0f );
+		leftWheel.startSynchronization();
+		leftWheel.rotate( -wheelDegrees, true );
+		rightWheel.rotate( -wheelDegrees, true );
+		leftWheel.endSynchronization();
+		waiting();
+	}
+	
+	/**
+	 * Moves the car backward by the specified distance in cm.
+	 * @param distance The distance in cm.
+	 */
+	public void moveBackward(double distance)
+	{
+		moveForward( -distance );
+	}
+	
+	/**
+	 * Draws a line from x1, y1 to x2, y2.
+	 * @param x1 Starting x coordinate.
+	 * @param y1 Starting y coordinate.
+	 * @param x2 Ending x coordinate.
+	 * @param y2 Ending y coordinate.
+	 * @return The ending point.
+	 */
+	public Point line(float x1, float y1, float x2, float y2)
+	{
+		return line( new Point(x1, y1), new Point(x2, y2) );
+	}
+	
+	/**
+	 * Draws a line from starting point to x, y.
+	 * @param startPoint The starting point.
+	 * @param x Ending x coordinate.
+	 * @param y Ending y coordinate
+	 * @return The ending point.
+	 */
+	public Point line(Point startPoint, float x, float y)
+	{
+		return line( startPoint, new Point(x, y) );
+	}
+	
+	/**
+	 * Draws a line from startPoint to endPoint.
+	 * @param startPoint The starting point.
+	 * @param endPoint The ending point.
+	 * @return The ending point.
+	 */
+	public Point line(Point startPoint, Point endPoint)
+	{
+		rotateTo( startPoint );
+		moveForward( position.distance( startPoint ) );
+		return lineTo( endPoint );
+	}
+	
+	/**
+	 * Draws a line from current position to x, y.
+	 * @param x Ending x coordinate.
+	 * @param y Ending y coordinate.
+	 * @return The ending point.
+	 */
+	public Point lineTo(float x, float y)
+	{
+		return lineTo( new Point(x, y) );
+	}
+	
+	/**
+	 * Draws a line from current position to endPoint.
+	 * @param endPoint The ending point.
+	 * @return The ending point.
+	 */
+	public Point lineTo(Point endPoint)
+	{
+		Point initial = new Point( position.x, position.y );
+		rotateTo( endPoint );
+		moveBackward( armLength );
+		lowerPen();
+		moveForward( initial.distance( endPoint ) );
+		raisePen();
+		moveForward( armLength );
+		return endPoint;
+	}
+	
+	/**
 	 * Sets the current direction the car is facing.
 	 * @param degrees Degrees to rotate direction by.
 	 */
-	private void setDirection(float degrees)
+	private void setDirection(double degrees)
 	{
 		float sinTheta = (float)Math.sin( Math.toRadians( degrees ) );
 		float cosTheta = (float)Math.cos( Math.toRadians( degrees ) );
@@ -167,7 +255,7 @@ public class Ev3TurtleDraw implements AutoCloseable
 		}
 		
 		float newX = direction.x * cosTheta - direction.y * sinTheta;
-		float newY = direction.x * sinTheta - direction.y * cosTheta;
+		float newY = direction.x * sinTheta + direction.y * cosTheta;
 		
 		direction.setLocation( newX, newY );
 		LCD.clear();
@@ -181,7 +269,7 @@ public class Ev3TurtleDraw implements AutoCloseable
 	 * direction by distance.
 	 * @param distance The distance to translate by.
 	 */
-	private void setPosition(float distance)
+	private void setPosition(double distance)
 	{
 		float xDist = (float)(distance * direction.x);
 		float yDist = (float)(distance * direction.y);
@@ -201,30 +289,6 @@ public class Ev3TurtleDraw implements AutoCloseable
 		LCD.drawString( "Position", 0, 0 );
 		LCD.drawString( "" + position.x + ", " + position.y, 0, 1 );
 		Delay.msDelay( 3000 );
-	}
-	
-	/**
-	 * Moves the car forward by the specified distance in cm.
-	 * @param distance The distance in cm.
-	 */
-	public void moveForward(float distance)
-	{
-		setPosition( distance );
-		int wheelDegrees = Math.round( distance / wheelCircumference * 360.0f );
-		leftWheel.startSynchronization();
-		leftWheel.rotate( -wheelDegrees, true );
-		rightWheel.rotate( -wheelDegrees, true );
-		leftWheel.endSynchronization();
-		waiting();
-	}
-	
-	/**
-	 * Moves the car backward by the specified distance in cm.
-	 * @param distance The distance in cm.
-	 */
-	public void moveBackward(float distance)
-	{
-		moveForward( -distance );
 	}
 	
 	/**

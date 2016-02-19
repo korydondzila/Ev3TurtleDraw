@@ -11,6 +11,9 @@
 
 package draw;
 
+import lejos.robotics.geometry.Point;
+
+
 /**
  * 
  */
@@ -24,16 +27,8 @@ public class Start
 	{
 		try ( Ev3TurtleDraw car = new Ev3TurtleDraw())
 		{
-			car.moveForward( 5 );
-			car.moveBackward( 5 );
-			car.moveForward( 5 );
-    		car.rotate( 90 );
-    		car.moveForward( 5 );
-    		car.rotate( 90 );
-    		car.moveForward( 5 );
-    		car.rotate( 90 );
-    		car.moveForward( 5 );
-    		car.rotate( 90 );
+			car.lineTo(20, 20);
+			car.line( 0, 0, -10, -10 );
 		}
 		catch ( Exception e )
 		{
