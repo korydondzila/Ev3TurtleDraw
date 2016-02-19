@@ -24,10 +24,16 @@ public class Start
 	{
 		try ( Ev3TurtleDraw car = new Ev3TurtleDraw())
 		{
+			car.moveForward( 5 );
+			car.moveBackward( 5 );
+			car.moveForward( 5 );
     		car.rotate( 90 );
-    		car.rotateTo( 5, 0 );
-    		car.rotate( -45 );
-    		car.rotateTo( -1, 4 );
+    		car.moveForward( 5 );
+    		car.rotate( 90 );
+    		car.moveForward( 5 );
+    		car.rotate( 90 );
+    		car.moveForward( 5 );
+    		car.rotate( 90 );
 		}
 		catch ( Exception e )
 		{
