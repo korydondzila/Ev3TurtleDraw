@@ -184,22 +184,33 @@ public class Letters
 	
 	private void O(float x, float y)
 	{
-		
+		car.line( x + 1, y - 1, x + 7, y - 1);
+		car.lineTo( x + 7, y - 9);
+		car.lineTo( x + 1, y - 9);
+		car.lineTo( x + 1, y - 1);
 	}
 	
 	private void P(float x, float y)
 	{
-		
+		car.line( x + 1, y - 9, x + 1, y - 1);
+		car.lineTo( x + 4, y - 1);
+		car.lineTo( x + 4, y - 4);
+		car.lineTo( x + 1, y - 4);
 	}
 	
 	private void Q(float x, float y)
 	{
-		
+		car.line( x + 2, y - 2, x + 6, y - 2);
+		car.lineTo( x + 6, y - 8);
+		car.lineTo( x + 2, y - 8);
+		car.lineTo( x + 2, y - 2);
+		car.line( x + 5, y - 7, x + 7, y - 9);
 	}
 	
 	private void R(float x, float y)
 	{
-		
+		P(x, y);
+		car.lineTo( x + 4, y - 9);
 	}
 	
 	private void S(float x, float y)
