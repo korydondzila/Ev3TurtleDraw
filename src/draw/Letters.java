@@ -146,7 +146,7 @@ public class Letters
 		car.line( x + 5, y - 1, x + 5, y - 9 );
 		car.line( x + 2, y - 9, x + 6, y - 9 );
 	}
-//TODO:J-R for Garret
+	
 	private void J(float x, float y)
 	{
 		car.line( x + 7, y - 1, x + 7, y - 9);
@@ -215,41 +215,58 @@ public class Letters
 	
 	private void S(float x, float y)
 	{
-		
+		car.line( x + 7, y - 3, x + 4, y - 1 );
+		car.lineTo( x + 2, y - 3 );
+		car.lineTo( x + 6, y - 7 );
+		car.lineTo( x + 4, y - 9 );
+		car.lineTo( x + 2, y - 7 );
 	}
 	
 	private void T(float x, float y)
 	{
-		
+		car.line( x + 2, y - 1, x + 6, y - 1 );
+		car.line( x + 4, y - 1, x + 4, y - 9 );
 	}
 	
 	private void U(float x, float y)
 	{
-		
+		car.line( x + 1, y - 1, x + 1, y - 7 );
+		car.lineTo( x + 4, y - 9 );
+		car.lineTo( x + 7, y - 7 );
+		car.lineTo( x + 7, y - 1 );
 	}
 	
 	private void V(float x, float y)
 	{
-		
+		car.line( x + 1, y - 1, x + 4, y - 9 );
+		car.lineTo( x + 7, y - 1 );
 	}
 	
 	private void W(float x, float y)
 	{
-		
+		car.line( x + 1, y - 1, x + 2.5f, y - 9 );
+		car.lineTo( x + 4, y - 1 );
+		car.lineTo( x + 5.5f, y - 9 );
+		car.lineTo( x + 7, y - 1 );
 	}
 	
 	private void X(float x, float y)
 	{
-		
+		car.line( x + 1, y - 1, x + 7, y - 9 );
+		car.line( x + 1, y - 9, x + 7, y - 1 );
 	}
 	
 	private void Y(float x, float y)
 	{
-		
+		car.line( x + 1, y - 1, x + 4, y - 5 );
+		car.lineTo( x + 4, y - 9);
+		car.line( x + 4, y - 5, x + 7, y - 1 );
 	}
 	
 	private void Z(float x, float y)
 	{
-		
+		car.line( x + 1, y - 1, x + 7, y - 1 );
+		car.lineTo( x + 1, y - 9 );
+		car.lineTo( x + 7, y - 9 );
 	}
 }
