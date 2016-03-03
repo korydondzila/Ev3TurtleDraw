@@ -146,30 +146,40 @@ public class Letters
 		car.line( x + 5, y - 1, x + 5, y - 9 );
 		car.line( x + 2, y - 9, x + 6, y - 9 );
 	}
-	
+//TODO:J-R for Garret
 	private void J(float x, float y)
 	{
-		
+		car.line( x + 7, y - 1, x + 7, y - 9);
+		car.lineTo( x + 3, y - 9);
+		car.lineTo( x + 3, y - 6);
 	}
 	
 	private void K(float x, float y)
 	{
-		
+		car.line( x + 1, y - 1, x + 1, y - 9);
+		car.line( x + 4, y - 1, x + 1, y - 4);
+		car.lineTo( x + 4, y - 9);
 	}
 	
 	private void L(float x, float y)
 	{
-		
+		car.line( x + 1, y - 1, x + 1, y - 9);
+		car.lineTo(x + 4, y - 9);
 	}
 	
 	private void M(float x, float y)
 	{
-		
+		car.line( x + 1, y - 9, x + 1, y - 1);
+		car.lineTo( x + 4, y - 4);
+		car.lineTo( x + 7, y - 1);
+		car.lineTo( x + 7, y - 9);
 	}
 	
 	private void N(float x, float y)
 	{
-		
+		car.line( x + 1, y - 9, x + 1, y - 1);
+		car.lineTo( x + 7, y - 9);
+		car.lineTo(x + 7, y - 1);
 	}
 	
 	private void O(float x, float y)
