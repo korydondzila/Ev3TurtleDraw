@@ -27,8 +27,10 @@ public class Start
 			car.setSpeedLeft( 180 );
 			car.setSpeedRight( 180 );
 			Letters text = new Letters( car );
-			text.drawString( 0, 0, "A 1BCDEF" );
-			text.drawString( 0, -10, "2GHI" );
+			text.drawString( 0, 0, "ABCDEF" );
+			text.drawString( 0, -10, "GHIJKL" );
+			text.drawString( 0, -20, "MNOPQR" );
+			text.drawString( 0, -30, "STUVWX" );
 		}
 		catch ( Exception e )
 		{

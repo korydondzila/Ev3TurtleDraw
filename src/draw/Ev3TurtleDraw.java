@@ -44,7 +44,7 @@ public class Ev3TurtleDraw implements AutoCloseable
 	 */
 	public Ev3TurtleDraw()
 	{
-		this( 5.6f, 16.5f, 26.0f, MotorPort.A, MotorPort.B, MotorPort.C );
+		this( 5.6f, 16.5f, 27.0f, MotorPort.A, MotorPort.B, MotorPort.C );
 	}
 	
 	/**
@@ -102,6 +102,7 @@ public class Ev3TurtleDraw implements AutoCloseable
 	private void lowerPen()
 	{
 		pen.rotate( 15, true );
+		pen.waitComplete();
 	}
 	
 	/**
@@ -110,6 +111,7 @@ public class Ev3TurtleDraw implements AutoCloseable
 	private void raisePen()
 	{
 		pen.rotate( -15, true );
+		pen.waitComplete();
 	}
 	
 	/**
