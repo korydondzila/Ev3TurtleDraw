@@ -81,7 +81,8 @@ public class Letters
 		car.line( x + 1, y - 9, x + 1, y - 1 );
 		car.lineTo( x + 4, y - 1 );
 		car.lineTo( x + 5, y - 2 );
-		car.lineTo( x + 5, y - 5 );
+		car.lineTo( x + 5, y - 4 );
+		car.lineTo( x + 4, y - 5 );
 		car.line( x + 1, y - 5, x + 6, y - 5 );
 		car.lineTo( x + 7, y - 6 );
 		car.lineTo( x + 7, y - 8 );
