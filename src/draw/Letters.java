@@ -58,6 +58,57 @@ public class Letters
 				case 'I':
 					I(x, y);
 					break;
+				case 'J':
+					J(x, y);
+					break;
+				case 'K':
+					K(x, y);
+					break;
+				case 'L':
+					L(x, y);
+					break;
+				case 'M':
+					M(x, y);
+					break;
+				case 'N':
+					N(x, y);
+					break;
+				case 'O':
+					O(x, y);
+					break;
+				case 'P':
+					P(x, y);
+					break;
+				case 'Q':
+					Q(x, y);
+					break;
+				case 'R':
+					R(x, y);
+					break;
+				case 'S':
+					S(x, y);
+					break;
+				case 'T':
+					T(x, y);
+					break;
+				case 'U':
+					U(x, y);
+					break;
+				case 'V':
+					V(x, y);
+					break;
+				case 'W':
+					W(x, y);
+					break;
+				case 'X':
+					X(x, y);
+					break;
+				case 'Y':
+					Y(x, y);
+					break;
+				case 'Z':
+					Z(x, y);
+					break;
 				case ' ':
 					break;
 				default:
