@@ -11,6 +11,7 @@
 
 package draw;
 
+import lejos.ev3.tools.EV3Control;
 import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
@@ -85,12 +86,22 @@ public class Ev3TurtleDraw implements AutoCloseable
 		pen.close();
 	}
 	
+	public void setSpeedLeft(int speed)
+	{
+		leftWheel.setSpeed( speed );
+	}
+	
+	public void setSpeedRight(int speed)
+	{
+		rightWheel.setSpeed( speed );
+	}
+	
 	/**
 	 * Lowers the pen.
 	 */
 	private void lowerPen()
 	{
-		pen.rotate( 10, true );
+		pen.rotate( 15, true );
 	}
 	
 	/**
@@ -98,7 +109,7 @@ public class Ev3TurtleDraw implements AutoCloseable
 	 */
 	private void raisePen()
 	{
-		pen.rotate( -10, true );
+		pen.rotate( -15, true );
 	}
 	
 	/**
@@ -258,10 +269,6 @@ public class Ev3TurtleDraw implements AutoCloseable
 		float newY = direction.x * sinTheta + direction.y * cosTheta;
 		
 		direction.setLocation( newX, newY );
-		LCD.clear();
-		LCD.drawString( "Direction", 0, 0 );
-		LCD.drawString( "" + direction.x + ", " + direction.y, 0, 1 );
-		Delay.msDelay( 3000 );
 	}
 	
 	/**
@@ -285,10 +292,6 @@ public class Ev3TurtleDraw implements AutoCloseable
 		}
 		
 		position.translate( xDist, yDist );
-		LCD.clear();
-		LCD.drawString( "Position", 0, 0 );
-		LCD.drawString( "" + position.x + ", " + position.y, 0, 1 );
-		Delay.msDelay( 3000 );
 	}
 	
 	/**
