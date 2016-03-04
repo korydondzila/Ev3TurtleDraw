@@ -4,7 +4,7 @@
  * Project:    LegoEv3
  * Date:       Feb 26, 2016, 11:05:24 AM
  * Purpose:    Class for letters using Ev3TurtleDraw
- * @author     Kory Dondzila, Garret Richardson, Theresa
+ * @author     Kory Dondzila, Garret Richardson, Theresa Horey
  * @version    "%I%, %G%"
  * Copyright:  2016
  */

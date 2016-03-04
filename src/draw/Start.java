@@ -4,7 +4,7 @@
  * Project:    LegoEv3
  * Date:       Feb 13, 2016, 2:24:04 PM
  * Purpose:    Main method
- * @author     Kory Dondzila, Garret Richardson, Theresa
+ * @author     Kory Dondzila, Garret Richardson, Theresa Horey
  * @version    "%I%, %G%"
  * Copyright:  2016
  */

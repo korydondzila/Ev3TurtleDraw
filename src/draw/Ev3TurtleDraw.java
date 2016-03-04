@@ -4,7 +4,7 @@
  * Project:    LegoEv3
  * Date:       Feb 17, 2016, 8:19:44 PM
  * Purpose:    Drawing Ev3 functions, works similarly to turtle graphics.
- * @author     Kory Dondzila, Garret Richardson, Theresa
+ * @author     Kory Dondzila, Garret Richardson, Theresa Horey
  * @version    "%I%, %G%"
  * Copyright:  2016
  */
