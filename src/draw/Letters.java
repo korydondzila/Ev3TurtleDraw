@@ -3,7 +3,7 @@
  * Package:    draw
  * Project:    LegoEv3
  * Date:       Feb 26, 2016, 11:05:24 AM
- * Purpose:    
+ * Purpose:    Class for letters using Ev3TurtleDraw
  * @author     Kory Dondzila, Garret Richardson, Theresa
  * @version    "%I%, %G%"
  * Copyright:  2016
@@ -12,17 +12,27 @@
 package draw;
 
 /**
- * 
+ * Class that uses an Ev3 turtle to draw letters
  */
 public class Letters
 {
 	private Ev3TurtleDraw car;
 	
+	/**
+	 * Base constructor
+	 * @param car The car to attach.
+	 */
 	public Letters(Ev3TurtleDraw car)
 	{
 		this.car = car;
 	}
 	
+	/**
+	 * Draws a string of letters starting at x, y
+	 * @param x The x coordinate
+	 * @param y The y coordinate
+	 * @param string The string to draw
+	 */
 	public void drawString(float x, float y, String string)
 	{
 		char[] characters = string.toUpperCase().toCharArray();

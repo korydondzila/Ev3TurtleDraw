@@ -11,25 +11,22 @@
 
 package draw;
 
-import lejos.ev3.tools.EV3Control;
-import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.Port;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.geometry.Point;
-import lejos.utility.Delay;
 
 /**
- * 
+ * Class of methods for a turtle drawing Ev3 car.
  */
 public class Ev3TurtleDraw implements AutoCloseable
 {
-	private float wheelDiameter;
+	//private float wheelDiameter;
 	private float wheelCircumference;
-	private float wheelBase;
-	private float baseCircumference;
+	//private float wheelBase;
+	//private float baseCircumference;
 	private float baseToWheelRatio;
 	private float armLength;
 	private Point position;
@@ -58,10 +55,10 @@ public class Ev3TurtleDraw implements AutoCloseable
 	 */
 	public Ev3TurtleDraw(float wheelDiameter, float wheelBase, float armLength, Port leftWheelPort, Port rightWheelPort, Port pen)
 	{
-		this.wheelDiameter = wheelDiameter;
+		//this.wheelDiameter = wheelDiameter;
 		this.wheelCircumference = (float)(wheelDiameter * Math.PI);
-		this.wheelBase = wheelBase;
-		this.baseCircumference = (float)(wheelBase * Math.PI);
+		//this.wheelBase = wheelBase;
+		//this.baseCircumference = (float)(wheelBase * Math.PI);
 		this.baseToWheelRatio = wheelBase / wheelDiameter;
 		this.armLength = armLength;
 		this.position = new Point( 0, 0 );
@@ -86,11 +83,19 @@ public class Ev3TurtleDraw implements AutoCloseable
 		pen.close();
 	}
 	
+	/**
+	 * Sets the speed of the left wheel.
+	 * @param speed The speed in degrees / s.
+	 */
 	public void setSpeedLeft(int speed)
 	{
 		leftWheel.setSpeed( speed );
 	}
 	
+	/**
+	 * Sets the speed of the right wheel
+	 * @param speed The speed in degrees / s.
+	 */
 	public void setSpeedRight(int speed)
 	{
 		rightWheel.setSpeed( speed );
