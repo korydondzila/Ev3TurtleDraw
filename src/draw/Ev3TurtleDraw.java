@@ -4,39 +4,26 @@
  * Project:    LegoEv3
  * Date:       Feb 17, 2016, 8:19:44 PM
  * Purpose:    Drawing Ev3 functions, works similarly to turtle graphics.
- * @author     Kory Dondzila, Garret Richardson, Theresa
+ * @author     Kory Dondzila, Garret Richardson, Theresa Horey
  * @version    "%I%, %G%"
  * Copyright:  2016
  */
 
 package draw;
 
-import lejos.hardware.ev3.EV3;
-import lejos.hardware.lcd.LCD;
-import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import car.Ev3Car;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.Port;
 import lejos.robotics.RegulatedMotor;
-import lejos.robotics.chassis.WheeledChassis;
 import lejos.robotics.geometry.Point;
-import lejos.utility.Delay;
 
 /**
- * 
+ * Class of methods for a turtle drawing Ev3 car.
  */
-public class Ev3TurtleDraw implements AutoCloseable
+public class Ev3TurtleDraw extends Ev3Car
 {
-	private float wheelDiameter;
-	private float wheelCircumference;
-	private float wheelBase;
-	private float baseCircumference;
-	private float baseToWheelRatio;
 	private float armLength;
-	private Point position;
-	private Point direction;
-	private RegulatedMotor leftWheel;
-	private RegulatedMotor rightWheel;
 	private RegulatedMotor pen;
 	
 	/**
@@ -45,35 +32,22 @@ public class Ev3TurtleDraw implements AutoCloseable
 	 */
 	public Ev3TurtleDraw()
 	{
-		this( 5.6f, 16.5f, 26.0f, MotorPort.A, MotorPort.B, MotorPort.C );
+		super( 5.6f, 16.5f, MotorPort.A, MotorPort.B );
+		this.armLength = 27.0f;
+		this.pen = new EV3MediumRegulatedMotor( MotorPort.C );
+		this.pen.setSpeed( 360 );
 	}
 	
 	/**
 	 * Constructor initializes Turtle car to given specifications.
-	 * @param wheelDiameter The diameter of wheels used.
-	 * @param wheelBase The distance between the centers of the two wheels.
 	 * @param armLength The distance from the center between the wheels to the pen tip.
-	 * @param leftWheelPort The left wheel's port.
-	 * @param rightWheelPort The right wheel's port.
 	 * @param penPort The pen's port.
 	 */
-	public Ev3TurtleDraw(float wheelDiameter, float wheelBase, float armLength, Port leftWheelPort, Port rightWheelPort, Port pen)
+	public Ev3TurtleDraw(float armLength, Port pen)
 	{
-		this.wheelDiameter = wheelDiameter;
-		this.wheelCircumference = (float)(wheelDiameter * Math.PI);
-		this.wheelBase = wheelBase;
-		this.baseCircumference = (float)(wheelBase * Math.PI);
-		this.baseToWheelRatio = wheelBase / wheelDiameter;
 		this.armLength = armLength;
-		this.position = new Point( 0, 0 );
-		this.direction = new Point( 1, 0 );
-		this.leftWheel = new EV3LargeRegulatedMotor( leftWheelPort );
-		this.rightWheel = new EV3LargeRegulatedMotor( rightWheelPort );
-		this.pen = new EV3LargeRegulatedMotor( pen );
-		this.leftWheel.setSpeed( 90 );
-		this.rightWheel.setSpeed( 90 );
+		this.pen = new EV3MediumRegulatedMotor( pen );
 		this.pen.setSpeed( 360 );
-		leftWheel.synchronizeWith( new RegulatedMotor[] {rightWheel} );
 	}
 	
 	/* (non-Javadoc)
@@ -92,7 +66,8 @@ public class Ev3TurtleDraw implements AutoCloseable
 	 */
 	private void lowerPen()
 	{
-		pen.rotate( 10, true );
+		pen.rotate( 15, true );
+		pen.waitComplete();
 	}
 	
 	/**
@@ -100,139 +75,73 @@ public class Ev3TurtleDraw implements AutoCloseable
 	 */
 	private void raisePen()
 	{
-		pen.rotate( -10, true );
+		pen.rotate( -15, true );
+		pen.waitComplete();
 	}
 	
 	/**
-	 * Rotates the car by degrees.
-	 * @param degrees Degrees to rotate by.
+	 * Draws a line from x1, y1 to x2, y2.
+	 * @param x1 Starting x coordinate.
+	 * @param y1 Starting y coordinate.
+	 * @param x2 Ending x coordinate.
+	 * @param y2 Ending y coordinate.
+	 * @return The ending point.
 	 */
-	public void rotate(float degrees)
+	public Point line(float x1, float y1, float x2, float y2)
 	{
-		setDirection( degrees );
-		float wheelDegrees = Math.round( degrees * baseToWheelRatio );
-		leftWheel.startSynchronization();
-		leftWheel.rotate( (int)wheelDegrees, true );
-		rightWheel.rotate( (int)-wheelDegrees, true );
-		leftWheel.endSynchronization();
-		waiting();
+		return line( new Point(x1, y1), new Point(x2, y2) );
 	}
 	
 	/**
-	 * Rotates to given x and y coordinates.
-	 * @param x The x coordinate.
-	 * @param y The y coordinate.
+	 * Draws a line from starting point to x, y.
+	 * @param startPoint The starting point.
+	 * @param x Ending x coordinate.
+	 * @param y Ending y coordinate
+	 * @return The ending point.
 	 */
-	public void rotateTo(float x, float y)
+	public Point line(Point startPoint, float x, float y)
 	{
-		rotateTo( new Point( x, y ) );
+		return line( startPoint, new Point(x, y) );
 	}
 	
 	/**
-	 * Rotates to specified point.
-	 * @param other The point to rotate towards.
+	 * Draws a line from startPoint to endPoint.
+	 * @param startPoint The starting point.
+	 * @param endPoint The ending point.
+	 * @return The ending point.
 	 */
-	public void rotateTo(Point other)
+	public Point line(Point startPoint, Point endPoint)
 	{
-		other = other.subtract( position );
-		other.normalize();
-		double radians = Math.acos( direction.dotProduct( other ) );
-		float degrees = (float)Math.toDegrees( radians );
-		
-		if ( direction.x * other.y - direction.y * other.x < 0)
-		{
-			degrees *= -1;
-		}
-		
-		rotate( degrees );
+		rotateTo( startPoint );
+		moveForward( position.distance( startPoint ) );
+		return lineTo( endPoint );
 	}
 	
 	/**
-	 * Sets the current direction the car is facing.
-	 * @param degrees Degrees to rotate direction by.
+	 * Draws a line from current position to x, y.
+	 * @param x Ending x coordinate.
+	 * @param y Ending y coordinate.
+	 * @return The ending point.
 	 */
-	private void setDirection(float degrees)
+	public Point lineTo(float x, float y)
 	{
-		float sinTheta = (float)Math.sin( Math.toRadians( degrees ) );
-		float cosTheta = (float)Math.cos( Math.toRadians( degrees ) );
-		
-		if ( sinTheta < 1.0e-16 && sinTheta > 0 )
-		{
-			sinTheta = 0;
-		}
-		
-		if ( cosTheta < 1.0e-16 && cosTheta > 0 )
-		{
-			cosTheta = 0;
-		}
-		
-		float newX = direction.x * cosTheta - direction.y * sinTheta;
-		float newY = direction.x * sinTheta - direction.y * cosTheta;
-		
-		direction.setLocation( newX, newY );
-		LCD.clear();
-		LCD.drawString( "Direction", 0, 0 );
-		LCD.drawString( "" + direction.x + ", " + direction.y, 0, 1 );
-		Delay.msDelay( 3000 );
+		return lineTo( new Point(x, y) );
 	}
 	
 	/**
-	 * Translates the current position along the current
-	 * direction by distance.
-	 * @param distance The distance to translate by.
+	 * Draws a line from current position to endPoint.
+	 * @param endPoint The ending point.
+	 * @return The ending point.
 	 */
-	private void setPosition(float distance)
+	public Point lineTo(Point endPoint)
 	{
-		float xDist = (float)(distance * direction.x);
-		float yDist = (float)(distance * direction.y);
-		
-		if ( xDist < 1.0e-16 && xDist > 0 || xDist > -1.0e-16 && xDist < 0)
-		{
-			xDist = 0;
-		}
-		
-		if ( yDist < 1.0e-16 && yDist > 0 || yDist > -1.0e-16 && yDist < 0 )
-		{
-			yDist = 0;
-		}
-		
-		position.translate( xDist, yDist );
-		LCD.clear();
-		LCD.drawString( "Position", 0, 0 );
-		LCD.drawString( "" + position.x + ", " + position.y, 0, 1 );
-		Delay.msDelay( 3000 );
-	}
-	
-	/**
-	 * Moves the car forward by the specified distance in cm.
-	 * @param distance The distance in cm.
-	 */
-	public void moveForward(float distance)
-	{
-		setPosition( distance );
-		int wheelDegrees = Math.round( distance / wheelCircumference * 360.0f );
-		leftWheel.startSynchronization();
-		leftWheel.rotate( -wheelDegrees, true );
-		rightWheel.rotate( -wheelDegrees, true );
-		leftWheel.endSynchronization();
-		waiting();
-	}
-	
-	/**
-	 * Moves the car backward by the specified distance in cm.
-	 * @param distance The distance in cm.
-	 */
-	public void moveBackward(float distance)
-	{
-		moveForward( -distance );
-	}
-	
-	/**
-	 * Waits until the motors stop moving.
-	 */
-	private void waiting()
-	{
-		leftWheel.waitComplete();
-		rightWheel.waitComplete();
+		Point initial = new Point( position.x, position.y );
+		rotateTo( endPoint );
+		moveBackward( armLength );
+		lowerPen();
+		moveForward( initial.distance( endPoint ) );
+		raisePen();
+		moveForward( armLength );
+		return endPoint;
 	}
 }
