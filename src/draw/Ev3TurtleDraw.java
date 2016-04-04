@@ -11,7 +11,7 @@
 
 package draw;
 
-import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import car.Ev3Car;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.Port;
@@ -21,18 +21,9 @@ import lejos.robotics.geometry.Point;
 /**
  * Class of methods for a turtle drawing Ev3 car.
  */
-public class Ev3TurtleDraw implements AutoCloseable
+public class Ev3TurtleDraw extends Ev3Car
 {
-	//private float wheelDiameter;
-	private float wheelCircumference;
-	//private float wheelBase;
-	//private float baseCircumference;
-	private float baseToWheelRatio;
 	private float armLength;
-	private Point position;
-	private Point direction;
-	private RegulatedMotor leftWheel;
-	private RegulatedMotor rightWheel;
 	private RegulatedMotor pen;
 	
 	/**
@@ -41,35 +32,22 @@ public class Ev3TurtleDraw implements AutoCloseable
 	 */
 	public Ev3TurtleDraw()
 	{
-		this( 5.6f, 16.5f, 27.0f, MotorPort.A, MotorPort.B, MotorPort.C );
+		super( 5.6f, 16.5f, MotorPort.A, MotorPort.B );
+		this.armLength = 27.0f;
+		this.pen = new EV3MediumRegulatedMotor( MotorPort.C );
+		this.pen.setSpeed( 360 );
 	}
 	
 	/**
 	 * Constructor initializes Turtle car to given specifications.
-	 * @param wheelDiameter The diameter of wheels used.
-	 * @param wheelBase The distance between the centers of the two wheels.
 	 * @param armLength The distance from the center between the wheels to the pen tip.
-	 * @param leftWheelPort The left wheel's port.
-	 * @param rightWheelPort The right wheel's port.
 	 * @param penPort The pen's port.
 	 */
-	public Ev3TurtleDraw(float wheelDiameter, float wheelBase, float armLength, Port leftWheelPort, Port rightWheelPort, Port pen)
+	public Ev3TurtleDraw(float armLength, Port pen)
 	{
-		//this.wheelDiameter = wheelDiameter;
-		this.wheelCircumference = (float)(wheelDiameter * Math.PI);
-		//this.wheelBase = wheelBase;
-		//this.baseCircumference = (float)(wheelBase * Math.PI);
-		this.baseToWheelRatio = wheelBase / wheelDiameter;
 		this.armLength = armLength;
-		this.position = new Point( 0, 0 );
-		this.direction = new Point( 1, 0 );
-		this.leftWheel = new EV3LargeRegulatedMotor( leftWheelPort );
-		this.rightWheel = new EV3LargeRegulatedMotor( rightWheelPort );
 		this.pen = new EV3MediumRegulatedMotor( pen );
-		this.leftWheel.setSpeed( 90 );
-		this.rightWheel.setSpeed( 90 );
 		this.pen.setSpeed( 360 );
-		leftWheel.synchronizeWith( new RegulatedMotor[] {rightWheel} );
 	}
 	
 	/* (non-Javadoc)
@@ -81,24 +59,6 @@ public class Ev3TurtleDraw implements AutoCloseable
 		leftWheel.close();
 		rightWheel.close();
 		pen.close();
-	}
-	
-	/**
-	 * Sets the speed of the left wheel.
-	 * @param speed The speed in degrees / s.
-	 */
-	public void setSpeedLeft(int speed)
-	{
-		leftWheel.setSpeed( speed );
-	}
-	
-	/**
-	 * Sets the speed of the right wheel
-	 * @param speed The speed in degrees / s.
-	 */
-	public void setSpeedRight(int speed)
-	{
-		rightWheel.setSpeed( speed );
 	}
 	
 	/**
@@ -117,74 +77,6 @@ public class Ev3TurtleDraw implements AutoCloseable
 	{
 		pen.rotate( -15, true );
 		pen.waitComplete();
-	}
-	
-	/**
-	 * Rotates the car by degrees.
-	 * @param degrees Degrees to rotate by.
-	 */
-	public void rotate(double degrees)
-	{
-		setDirection( degrees );
-		float wheelDegrees = Math.round( degrees * baseToWheelRatio );
-		leftWheel.startSynchronization();
-		leftWheel.rotate( (int)wheelDegrees, true );
-		rightWheel.rotate( (int)-wheelDegrees, true );
-		leftWheel.endSynchronization();
-		waiting();
-	}
-	
-	/**
-	 * Rotates to given x and y coordinates.
-	 * @param x The x coordinate.
-	 * @param y The y coordinate.
-	 */
-	public void rotateTo(float x, float y)
-	{
-		rotateTo( new Point( x, y ) );
-	}
-	
-	/**
-	 * Rotates to specified point.
-	 * @param other The point to rotate towards.
-	 */
-	public void rotateTo(Point other)
-	{
-		other = other.subtract( position );
-		other.normalize();
-		double radians = Math.acos( direction.dotProduct( other ) );
-		float degrees = (float)Math.toDegrees( radians );
-		
-		if ( direction.x * other.y - direction.y * other.x < 0)
-		{
-			degrees *= -1;
-		}
-		
-		rotate( degrees );
-	}
-	
-	/**
-	 * Moves the car forward by the specified distance in cm.
-	 * @param distance The distance in cm.
-	 */
-	public void moveForward(double distance)
-	{
-		setPosition( distance );
-		int wheelDegrees = (int)Math.round( distance / wheelCircumference * 360.0f );
-		leftWheel.startSynchronization();
-		leftWheel.rotate( -wheelDegrees, true );
-		rightWheel.rotate( -wheelDegrees, true );
-		leftWheel.endSynchronization();
-		waiting();
-	}
-	
-	/**
-	 * Moves the car backward by the specified distance in cm.
-	 * @param distance The distance in cm.
-	 */
-	public void moveBackward(double distance)
-	{
-		moveForward( -distance );
 	}
 	
 	/**
@@ -251,62 +143,5 @@ public class Ev3TurtleDraw implements AutoCloseable
 		raisePen();
 		moveForward( armLength );
 		return endPoint;
-	}
-	
-	/**
-	 * Sets the current direction the car is facing.
-	 * @param degrees Degrees to rotate direction by.
-	 */
-	private void setDirection(double degrees)
-	{
-		float sinTheta = (float)Math.sin( Math.toRadians( degrees ) );
-		float cosTheta = (float)Math.cos( Math.toRadians( degrees ) );
-		
-		if ( sinTheta < 1.0e-16 && sinTheta > 0 )
-		{
-			sinTheta = 0;
-		}
-		
-		if ( cosTheta < 1.0e-16 && cosTheta > 0 )
-		{
-			cosTheta = 0;
-		}
-		
-		float newX = direction.x * cosTheta - direction.y * sinTheta;
-		float newY = direction.x * sinTheta + direction.y * cosTheta;
-		
-		direction.setLocation( newX, newY );
-	}
-	
-	/**
-	 * Translates the current position along the current
-	 * direction by distance.
-	 * @param distance The distance to translate by.
-	 */
-	private void setPosition(double distance)
-	{
-		float xDist = (float)(distance * direction.x);
-		float yDist = (float)(distance * direction.y);
-		
-		if ( xDist < 1.0e-16 && xDist > 0 || xDist > -1.0e-16 && xDist < 0)
-		{
-			xDist = 0;
-		}
-		
-		if ( yDist < 1.0e-16 && yDist > 0 || yDist > -1.0e-16 && yDist < 0 )
-		{
-			yDist = 0;
-		}
-		
-		position.translate( xDist, yDist );
-	}
-	
-	/**
-	 * Waits until the motors stop moving.
-	 */
-	private void waiting()
-	{
-		leftWheel.waitComplete();
-		rightWheel.waitComplete();
 	}
 }
