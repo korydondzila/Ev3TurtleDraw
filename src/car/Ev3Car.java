@@ -30,8 +30,7 @@ public class Ev3Car implements AutoCloseable
 	protected RegulatedMotor rightWheel;
 	
 	/**
-	 * Base Constructor uses values based on original
-	 * Turtle car setup.
+	 * Base Constructor uses values based on original car setup.
 	 */
 	public Ev3Car()
 	{
@@ -39,7 +38,7 @@ public class Ev3Car implements AutoCloseable
 	}
 	
 	/**
-	 * Constructor initializes Turtle car to given specifications.
+	 * Constructor initializes car to given specifications.
 	 * @param wheelDiameter The diameter of wheels used.
 	 * @param wheelBase The distance between the centers of the two wheels.
 	 * @param leftWheelPort The left wheel's port.

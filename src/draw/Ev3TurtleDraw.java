@@ -32,10 +32,7 @@ public class Ev3TurtleDraw extends Ev3Car
 	 */
 	public Ev3TurtleDraw()
 	{
-		super( 5.6f, 16.5f, MotorPort.A, MotorPort.B );
-		this.armLength = 27.0f;
-		this.pen = new EV3MediumRegulatedMotor( MotorPort.C );
-		this.pen.setSpeed( 360 );
+		this( 5.6f, 16.5f, 27.0f, MotorPort.A, MotorPort.B, MotorPort.C );
 	}
 	
 	/**
@@ -43,8 +40,9 @@ public class Ev3TurtleDraw extends Ev3Car
 	 * @param armLength The distance from the center between the wheels to the pen tip.
 	 * @param penPort The pen's port.
 	 */
-	public Ev3TurtleDraw(float armLength, Port pen)
+	public Ev3TurtleDraw(float wheelDiameter, float wheelBase, float armLength, Port leftWheelPort, Port rightWheelPort, Port pen)
 	{
+		super( wheelDiameter, wheelBase, leftWheelPort, rightWheelPort );
 		this.armLength = armLength;
 		this.pen = new EV3MediumRegulatedMotor( pen );
 		this.pen.setSpeed( 360 );
@@ -56,8 +54,7 @@ public class Ev3TurtleDraw extends Ev3Car
 	@Override
 	public void close() throws Exception
 	{
-		leftWheel.close();
-		rightWheel.close();
+		super.close();
 		pen.close();
 	}
 	
