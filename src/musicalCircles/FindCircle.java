@@ -43,10 +43,10 @@ public class FindCircle
 	      }
 	}
 	
-	//the car will back up this amount when it detects an object
+	//the car will back up this amount in cm when it detects an object
 	static final double RETREAT_AMOUNT = 5.0;
-	//the car will rotate until the sensor detects this distance from an object
-	static final double RETREAT_ROTATE_UNTIL = 10.0;
+	//the car will rotate until the sensor detects this distance in meters from an object
+	static final double RETREAT_ROTATE_UNTIL = 0.25;
 	//the car will move forward each "step" this amount in cm
 	static final double MOVE_FORWARD_AMOUNT = 3.0;
 	
@@ -85,7 +85,7 @@ public class FindCircle
 				//away and repeats. Drops out as soon as it detects black
 				if ( isDistSensor)
 				{
-					if (distanceSample[0] <= 0.5 )
+					if (distanceSample[0] <= 0.1 )
 					{	
 						car.moveBackward(RETREAT_AMOUNT);
 						distance.fetchSample( distanceSample, 0 );
