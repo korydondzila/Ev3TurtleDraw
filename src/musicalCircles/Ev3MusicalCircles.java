@@ -3,8 +3,8 @@
  * Package:    musicalCircles
  * Project:    LegoEv3
  * Date:       Apr 4, 2016, 1:50:34 PM
- * Purpose:    
- * @author     Kory Dondzila
+ * Purpose:    Ev3 musical circles car functions.
+ * @author     Kory Dondzila, Garret Richardson, Theresa Horey
  * @version    "%I%, %G%"
  * Copyright:  2016
  */
@@ -56,6 +56,8 @@ public class Ev3MusicalCircles extends Ev3Car
 		this.ultrasonicSensor = new EV3UltrasonicSensor( ultrasonicPort );
 		this.color = colorSensor.getColorIDMode();
 		this.distance = ultrasonicSensor.getDistanceMode();
+		this.colorSensor.setFloodlight( true );
+		this.ultrasonicSensor.enable();
 	}
 	
 	/* (non-Javadoc)
@@ -68,4 +70,22 @@ public class Ev3MusicalCircles extends Ev3Car
 		colorSensor.close();
 		ultrasonicSensor.close();
 	}
+
+	/**
+	 * @return the color
+	 */
+	public SampleProvider getColor()
+	{
+		return this.color;
+	}
+
+	/**
+	 * @return the distance
+	 */
+	public SampleProvider getDistance()
+	{
+		return this.distance;
+	}
+	
+	
 }

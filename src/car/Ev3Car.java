@@ -4,7 +4,7 @@
  * Project:    LegoEv3
  * Date:       Apr 4, 2016, 1:10:14 PM
  * Purpose:    Ev3 car functions.
- * @author     Kory Dondzila, Garret Richardson, Theresa Horey
+ * @author     Kory Dondzila, Garret Richardson, Therese Horey
  * @version    "%I%, %G%"
  * Copyright:  2016
  */
