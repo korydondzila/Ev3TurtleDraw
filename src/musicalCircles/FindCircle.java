@@ -47,9 +47,9 @@ public class FindCircle
 	//the car will back up this amount in cm when it detects an object
 	static final double RETREAT_AMOUNT = 5.0;
 	//the car will rotate until the sensor detects this distance in meters from an object
-	static final double RETREAT_ROTATE_UNTIL = 0.25;
+	static final double RETREAT_ROTATE_UNTIL = 0.5;
 	//the car will move forward each "step" this amount in cm
-	static final double MOVE_FORWARD_AMOUNT = 3.0;
+	static final double MOVE_FORWARD_AMOUNT = 5.0;
 	
 
 	/**
@@ -59,6 +59,9 @@ public class FindCircle
 	{
 		try ( Ev3MusicalCircles car = new Ev3MusicalCircles() )
 		{
+			car.setSpeedLeft( 180 );
+			car.setSpeedRight( 180 );
+			
 			SampleProvider color = car.getColor();
 			SampleProvider distance = car.getDistance();
 			float[] colorSample = new float[color.sampleSize()];
@@ -71,8 +74,32 @@ public class FindCircle
 			{
 				color.fetchSample( colorSample, 0 );
 				distance.fetchSample( distanceSample, 0 );
-				car.setSpeedLeft( 180 );
-				car.setSpeedRight( 180 );
+				
+				//STATE 1: ROOMBA MODE
+				//Drives forward until it encounters something, and then rotates until it is facing
+				//away and repeats. Drops out as soon as it detects black
+				if ( isDistSensor && !isFound )
+				{
+					if ( distanceSample[0] <= 0.25 )
+					{	
+						car.moveBackward( RETREAT_AMOUNT );
+						distance.fetchSample( distanceSample, 0 );
+						
+						while ( isDistSensor && !isFound && distanceSample[0] <= RETREAT_ROTATE_UNTIL )
+						{
+							car.rotate(rand.nextInt( 135 ) + 45);//rotate until distanceSample > 10
+							
+							color.fetchSample( colorSample, 0 );
+							distance.fetchSample( distanceSample, 0 );
+							
+							if ( colorSample[0] == ColorId.BLACK.id )
+							{
+								isDistSensor = false;
+								isFound = true;
+							}
+						}
+					}
+				}
 			
 				if ( !isFound && colorSample[0] == ColorId.BLACK.id )
 				{
@@ -93,8 +120,9 @@ public class FindCircle
 						car.rotate( -2 );
 						degreesTurned += 2;
 						
-						if ( degreesTurned >= 360 )
+						if ( degreesTurned >= 200 )
 						{
+							car.rotate( degreesTurned );
 							break;
 						}
 					}
@@ -115,11 +143,6 @@ public class FindCircle
 					}
 				}
 				
-				if ( !isFound )
-				{
-					car.moveForward( 5 );
-				}
-				
 				if ( leftSide )
 				{
 					
@@ -134,33 +157,10 @@ public class FindCircle
 					break;
 				}
 				
-				//STATE 1: ROOMBA MODE
-				//Drives forward until it encounters something, and then rotates until it is facing
-				//away and repeats. Drops out as soon as it detects black
-				if ( isDistSensor && !isFound)
+				if ( !isFound )
 				{
-					if (distanceSample[0] <= 0.1 )
-					{	
-						car.moveBackward(RETREAT_AMOUNT);
-						distance.fetchSample( distanceSample, 0 );
-						while (isDistSensor && !isFound && distanceSample[0] <= RETREAT_ROTATE_UNTIL)
-						{
-							car.rotate(rand.nextInt( 135 ) + 45);//rotate until distanceSample > 10
-							
-							color.fetchSample( colorSample, 0 );
-							distance.fetchSample( distanceSample, 0 );
-							if ( colorSample[0] == ColorId.BLACK.id )
-							{
-								isDistSensor = false;
-								isFound = true;
-							}
-						}
-						
-					}
-					car.moveForward(MOVE_FORWARD_AMOUNT);
+					car.moveForward( MOVE_FORWARD_AMOUNT );
 				}
-				LCD.drawString( "Color: " + colorSample[0], 0, 0 );
-				
 			}
 		}
 		catch ( Exception e )
@@ -171,7 +171,5 @@ public class FindCircle
 		{
 			//explode
 		}
-
 	}
-
 }
