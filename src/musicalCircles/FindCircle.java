@@ -43,6 +43,14 @@ public class FindCircle
 	      }
 	}
 	
+	//the car will back up this amount when it detects an object
+	static final double RETREAT_AMOUNT = 5.0;
+	//the car will rotate until the sensor detects this distance from an object
+	static final double RETREAT_ROTATE_UNTIL = 10.0;
+	//the car will move forward each "step" this amount in cm
+	static final double MOVE_FORWARD_AMOUNT = 3.0;
+	
+
 	/**
 	 * @param args
 	 */
@@ -65,17 +73,39 @@ public class FindCircle
 				color.fetchSample( colorSample, 0 );
 				distance.fetchSample( distanceSample, 0 );
 				
-				if ( isDistSensor && distanceSample[0] <= 0.5 )
-				{
-					car.rotate( rand.nextInt( 135 ) + 45 );
-				}
-				
-				LCD.drawString( "Color: " + colorSample[0], 0, 0 );
+
 				
 				if ( colorSample[0] == ColorId.BLACK.id )
 				{
 					isDistSensor = false;
 				}
+				
+				//STATE 1: ROOMBA MODE
+				//Drives forward until it encounters something, and then rotates until it is facing
+				//away and repeats. Drops out as soon as it detects black
+				if ( isDistSensor)
+				{
+					if (distanceSample[0] <= 0.5 )
+					{	
+						car.moveBackward(RETREAT_AMOUNT);
+						distance.fetchSample( distanceSample, 0 );
+						while (isDistSensor && distanceSample[0] <= RETREAT_ROTATE_UNTIL)
+						{
+							car.rotate(rand.nextInt( 135 ) + 45);//rotate until distanceSample > 10
+							
+							color.fetchSample( colorSample, 0 );
+							distance.fetchSample( distanceSample, 0 );
+							if ( colorSample[0] == ColorId.BLACK.id )
+							{
+								isDistSensor = false;
+							}
+						}
+						
+					}
+					car.moveForward(MOVE_FORWARD_AMOUNT);
+				}
+				LCD.drawString( "Color: " + colorSample[0], 0, 0 );
+				
 			}
 		}
 		catch ( Exception e )
@@ -84,7 +114,7 @@ public class FindCircle
 		}
 		finally
 		{
-			
+			//explode
 		}
 
 	}
