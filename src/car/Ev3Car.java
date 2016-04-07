@@ -68,6 +68,14 @@ public class Ev3Car implements AutoCloseable
 	}
 	
 	/**
+	 * @return the direction
+	 */
+	public Point getDirection()
+	{
+		return this.direction;
+	}
+
+	/**
 	 * Sets the speed of the left wheel.
 	 * @param speed The speed in degrees / s.
 	 */
