@@ -47,7 +47,7 @@ public class FindCircle
 	//the car will back up this amount in cm when it detects an object
 	static final double RETREAT_AMOUNT = 5.0;
 	//the car will rotate until the sensor detects this distance in meters from an object
-	static final double RETREAT_ROTATE_UNTIL = 0.5;
+	static final double WALL_DISTANCE = 0.3;
 	//the car will move forward each "step" this amount in cm
 	static final double MOVE_FORWARD_AMOUNT = 5.0;
 	
@@ -80,14 +80,15 @@ public class FindCircle
 				//away and repeats. Drops out as soon as it detects black
 				if ( isDistSensor && !isFound )
 				{
-					if ( distanceSample[0] <= 0.25 )
+					if ( distanceSample[0] < 0.3 )
 					{	
 						car.moveBackward( RETREAT_AMOUNT );
 						distance.fetchSample( distanceSample, 0 );
 						
-						while ( isDistSensor && !isFound && distanceSample[0] <= RETREAT_ROTATE_UNTIL )
+						do
 						{
-							car.rotate(rand.nextInt( 135 ) + 45);//rotate until distanceSample > 10
+							int direction = rand.nextInt( 2 );
+							car.rotate( (rand.nextInt( 90 ) + 45) * (direction == 0 ? -1 : 1) );
 							
 							color.fetchSample( colorSample, 0 );
 							distance.fetchSample( distanceSample, 0 );
@@ -97,7 +98,7 @@ public class FindCircle
 								isDistSensor = false;
 								isFound = true;
 							}
-						}
+						} while ( isDistSensor && !isFound && distanceSample[0] < WALL_DISTANCE );
 					}
 				}
 			
