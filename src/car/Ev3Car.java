@@ -149,7 +149,7 @@ public class Ev3Car implements AutoCloseable
 		leftWheel.rotate( -wheelDegrees, true );
 		rightWheel.rotate( -wheelDegrees, true );
 		leftWheel.endSynchronization();
-		waiting();
+		//waiting();
 	}
 	
 	/**
@@ -212,7 +212,7 @@ public class Ev3Car implements AutoCloseable
 	/**
 	 * Waits until the motors stop moving.
 	 */
-	private void waiting()
+	public void waiting()
 	{
 		leftWheel.waitComplete();
 		rightWheel.waitComplete();

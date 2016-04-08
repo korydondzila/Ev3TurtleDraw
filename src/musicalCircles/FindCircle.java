@@ -47,7 +47,7 @@ public class FindCircle
 	static final double RETREAT_AMOUNT = 5.0;
 	
 	//the car will rotate until the sensor detects this distance in meters from an object
-	static final double WALL_DISTANCE = 0.3;
+	static final double WALL_DISTANCE = 0.2;
 	
 	//the car will move forward each "step" this amount in cm
 	static final double MOVE_FORWARD_AMOUNT = 5.0;
@@ -60,8 +60,8 @@ public class FindCircle
 		try ( Ev3MusicalCircles car = new Ev3MusicalCircles() )
 		{
 			// Set wheel speed
-			car.setSpeedLeft( 180 );
-			car.setSpeedRight( 180 );
+			car.setSpeedLeft( 360 );
+			car.setSpeedRight( 360 );
 			
 			// Get SampleProviders and initialize sample srrays.
 			SampleProvider color = car.getColor();
@@ -74,110 +74,129 @@ public class FindCircle
 			boolean isDistSensor = true, isFound = false, rightSide = false, leftSide = false;
 			int degreesTurned = 0;
 			
-			// Main while loop, RR
-			while ( true )
+			while (true)
 			{
-				// Fetch samples
-				color.fetchSample( colorSample, 0 );
-				distance.fetchSample( distanceSample, 0 );
-				
-				// Check if on black area
-				if ( !isFound && colorSample[0] == ColorId.BLACK.id )
-				{
-					isDistSensor = false; // stop checking for obstacles.
-					isFound = true;
-				}
-				
-				//STATE 1: ROOMBA MODE
-				//Drives forward until it encounters something, and then rotates until it is facing
-				//away and repeats. Drops out as soon as it detects black
-				if ( isDistSensor && !isFound )
-				{
-					if ( distanceSample[0] < 0.3 ) // near obstacle
-					{
-						car.moveBackward( RETREAT_AMOUNT );
-						
-						// Keep rotating if near obstacle
-						do
-						{
-							int direction = rand.nextInt( 2 ); // Choose left or right
-							car.rotate( (rand.nextInt( 90 ) + 45) * (direction == 0 ? -1 : 1) );
-							
-							// Get new sensor data
-							color.fetchSample( colorSample, 0 );
-							distance.fetchSample( distanceSample, 0 );
-							
-							// Check if on black area
-							if ( colorSample[0] == ColorId.BLACK.id )
-							{
-								isDistSensor = false;
-								isFound = true;
-							}
-						} while ( isDistSensor && !isFound && distanceSample[0] < WALL_DISTANCE );
-					}
-				}
-				
-				// Searches for right side of circle then rotates back
-				// to original direction
-				if ( isFound && !rightSide )
-				{
-					if ( colorSample[0] != ColorId.BLACK.id ) // Found right side
-					{
-						rightSide = true;
-						car.rotate( degreesTurned );
-						color.fetchSample( colorSample, 0 ); // Update sensor data
-					}
-					else // Rotate right and store degrees
-					{
-						car.rotate( -2 );
-						degreesTurned += 2;
-						
-						// Too far in black and can't determine center location
-						if ( degreesTurned >= 200 )
-						{
-							car.rotate( degreesTurned );
-							break; // End program
-						}
-					}
-				}
-				
-				// Searches for left side of circle then rotates to face center
-				if ( isFound && rightSide && !leftSide )
-				{
-					if ( colorSample[0] != ColorId.BLACK.id ) // Found left side
-					{
-						leftSide = true;
-						car.rotate( -degreesTurned / 2 ); // Rotate to center
-						color.fetchSample( colorSample, 0 ); // Update sensor data
-					}
-					else // Rotate left and store degrees
-					{
-						car.rotate( 2 );
-						degreesTurned += 2;
-					}
-				}
-				
-				// Move towards center
-				if ( leftSide )
-				{
-					float distanceToCenter = 10.16f;
-					
-					// Amount to move is based on total degrees turned this
-					// roughly estimates how close to the center the car already is.
-					if ( degreesTurned > 180 )
-					{
-						distanceToCenter -= ((degreesTurned - 180) / 180 * 2) * 2.54;
-					}
-					
-					car.moveForward( distanceToCenter );
-					break; // End program
-				}
-				
-				// Hasn't found circle, move forward
-				if ( !isFound )
-				{
-					car.moveForward( MOVE_FORWARD_AMOUNT );
-				}
+    			// Main while loop, RR
+    			while ( true )
+    			{
+    				// Fetch samples
+    				color.fetchSample( colorSample, 0 );
+    				distance.fetchSample( distanceSample, 0 );
+    				
+    				// Check if on black area
+    				if ( !isFound && colorSample[0] == ColorId.BLACK.id )
+    				{
+    					isDistSensor = false; // stop checking for obstacles.
+    					isFound = true;
+    				}
+    				
+    				//STATE 1: ROOMBA MODE
+    				//Drives forward until it encounters something, and then rotates until it is facing
+    				//away and repeats. Drops out as soon as it detects black
+    				if ( isDistSensor && !isFound )
+    				{
+    					if ( distanceSample[0] < WALL_DISTANCE ) // near obstacle
+    					{
+    						car.moveBackward( RETREAT_AMOUNT );
+    						
+    						// Keep rotating if near obstacle
+    						do
+    						{
+    							int direction = rand.nextInt( 2 ); // Choose left or right
+    							car.rotate( (rand.nextInt( 90 ) + 45) * (direction == 0 ? -1 : 1) );
+    							
+    							// Get new sensor data
+    							color.fetchSample( colorSample, 0 );
+    							distance.fetchSample( distanceSample, 0 );
+    							
+    							// Check if on black area
+    							if ( colorSample[0] == ColorId.BLACK.id )
+    							{
+    								isDistSensor = false;
+    								isFound = true;
+    							}
+    						} while ( isDistSensor && !isFound && distanceSample[0] < WALL_DISTANCE );
+    					}
+    				}
+    				
+    				// Searches for right side of circle then rotates back
+    				// to original direction
+    				if ( isFound && !rightSide )
+    				{
+    					if ( colorSample[0] != ColorId.BLACK.id ) // Found right side
+    					{
+    						rightSide = true;
+    						car.rotate( degreesTurned );
+    						color.fetchSample( colorSample, 0 ); // Update sensor data
+    					}
+    					else // Rotate right and store degrees
+    					{
+    						car.rotate( -2 );
+    						degreesTurned += 2;
+    						
+    						// Too far in black and can't determine center location
+    						if ( degreesTurned >= 200 )
+    						{
+    							car.rotate( degreesTurned );
+    							break; // End program
+    						}
+    					}
+    				}
+    				
+    				// Searches for left side of circle then rotates to face center
+    				if ( isFound && rightSide && !leftSide )
+    				{
+    					if ( colorSample[0] != ColorId.BLACK.id ) // Found left side
+    					{
+    						leftSide = true;
+    						car.rotate( -degreesTurned / 2 ); // Rotate to center
+    						color.fetchSample( colorSample, 0 ); // Update sensor data
+    					}
+    					else // Rotate left and store degrees
+    					{
+    						car.rotate( 2 );
+    						degreesTurned += 2;
+    					}
+    				}
+    				
+    				// Move towards center
+    				if ( leftSide )
+    				{
+    					float distanceToCenter = 10.16f;
+    					
+    					// Amount to move is based on total degrees turned this
+    					// roughly estimates how close to the center the car already is.
+    					if ( degreesTurned > 180 )
+    					{
+    						distanceToCenter -= ((degreesTurned - 180) / 180 * 2) * 2.54;
+    					}
+    					
+    					car.moveForward( distanceToCenter );
+    					car.waiting();
+    					break; // End program
+    				}
+    				
+    				// Hasn't found circle, move forward
+    				if ( !isFound )
+    				{
+    					car.moveForward( MOVE_FORWARD_AMOUNT );
+    				}
+    			}
+    			
+    			// Incase car is pushed off circle.
+    			while (true)
+    			{
+    				color.fetchSample( colorSample, 0 );
+    				if ( colorSample[0] != ColorId.BLACK.id )
+    				{
+    					isDistSensor = true; // stop checking for obstacles.
+    					isFound = false;
+    					degreesTurned = 0;
+    					rightSide = false;
+    					leftSide = false;
+    					break;
+    				}
+    			}
 			}
 		}
 		catch ( Exception e )
