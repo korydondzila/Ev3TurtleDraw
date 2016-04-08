@@ -44,8 +44,8 @@ public class Ev3MusicalCircles extends Ev3Car
 	 * @param wheelBase The distance between the centers of the two wheels.
 	 * @param leftWheelPort The left wheel's port.
 	 * @param rightWheelPort The right wheel's port.
-	 * @param colorPort The color sensor port
-	 * @param ultrasonicPort The ultrasonic sensor port.s
+	 * @param colorPort The color sensor port.
+	 * @param ultrasonicPort The ultrasonic sensor port.
 	 */
 	public Ev3MusicalCircles( float wheelDiameter, float wheelBase,
 							  Port leftWheelPort, Port rightWheelPort,
@@ -72,7 +72,7 @@ public class Ev3MusicalCircles extends Ev3Car
 	}
 
 	/**
-	 * @return the color
+	 * @return the color SampleProvider
 	 */
 	public SampleProvider getColor()
 	{
@@ -80,7 +80,7 @@ public class Ev3MusicalCircles extends Ev3Car
 	}
 
 	/**
-	 * @return the distance
+	 * @return the distance SampleProvider
 	 */
 	public SampleProvider getDistance()
 	{
