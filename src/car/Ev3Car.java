@@ -74,6 +74,30 @@ public class Ev3Car implements AutoCloseable
 	{
 		return this.direction;
 	}
+	
+	/**
+	 * @return the left wheel
+	 */
+	public RegulatedMotor LeftWheel()
+	{
+		return leftWheel;
+	}
+	
+	/**
+	 * @return the right wheel
+	 */
+	public RegulatedMotor RightWheel()
+	{
+		return rightWheel;
+	}
+	
+	/**
+	 * @return the base to wheel ratio
+	 */
+	public float BaseToWheelRatio()
+	{
+		return baseToWheelRatio;
+	}
 
 	/**
 	 * Sets the speed of the left wheel.
@@ -149,7 +173,7 @@ public class Ev3Car implements AutoCloseable
 		leftWheel.rotate( -wheelDegrees, true );
 		rightWheel.rotate( -wheelDegrees, true );
 		leftWheel.endSynchronization();
-		//waiting();
+		waiting();
 	}
 	
 	/**

@@ -14,6 +14,7 @@ package musicalCircles;
 
 import java.util.Random;
 import lejos.robotics.SampleProvider;
+import lejos.utility.Delay;
 
 public class FindCircle
 {
@@ -48,9 +49,6 @@ public class FindCircle
 	
 	//the car will rotate until the sensor detects this distance in meters from an object
 	static final double WALL_DISTANCE = 0.2;
-	
-	//the car will move forward each "step" this amount in cm
-	static final double MOVE_FORWARD_AMOUNT = 5.0;
 
 	/**
 	 * @param args
@@ -71,10 +69,9 @@ public class FindCircle
 			
 			// Initialize flags and counter
 			Random rand = new Random();
-			boolean isDistSensor = true, isFound = false, rightSide = false, leftSide = false;
-			int degreesTurned = 0;
+			boolean isFound = false;
 			
-			while (true)
+			while ( true )
 			{
     			// Main while loop, RR
     			while ( true )
@@ -84,19 +81,21 @@ public class FindCircle
     				distance.fetchSample( distanceSample, 0 );
     				
     				// Check if on black area
-    				if ( !isFound && colorSample[0] == ColorId.BLACK.id )
+    				if ( !isFound )
     				{
-    					isDistSensor = false; // stop checking for obstacles.
-    					isFound = true;
-    				}
-    				
-    				//STATE 1: ROOMBA MODE
-    				//Drives forward until it encounters something, and then rotates until it is facing
-    				//away and repeats. Drops out as soon as it detects black
-    				if ( isDistSensor && !isFound )
-    				{
-    					if ( distanceSample[0] < WALL_DISTANCE ) // near obstacle
+    					if ( colorSample[0] == ColorId.BLACK.id )
     					{
+    						// Circle found stop car
+        					car.LeftWheel().startSynchronization();
+    						car.LeftWheel().stop();
+    						car.RightWheel().stop();
+    						car.LeftWheel().endSynchronization();
+        					isFound = true;
+    					}
+    					else if ( distanceSample[0] < WALL_DISTANCE ) // near obstacle
+    					{
+    						//Drives forward until it encounters something, and then rotates until it is facing
+    	    				//away and repeats. Drops out as soon as it detects black
     						car.moveBackward( RETREAT_AMOUNT );
     						
     						// Keep rotating if near obstacle
@@ -112,74 +111,114 @@ public class FindCircle
     							// Check if on black area
     							if ( colorSample[0] == ColorId.BLACK.id )
     							{
-    								isDistSensor = false;
     								isFound = true;
     							}
-    						} while ( isDistSensor && !isFound && distanceSample[0] < WALL_DISTANCE );
+    						} while ( !isFound && distanceSample[0] < WALL_DISTANCE );
+    					}
+    					else
+    					{
+    						// Car not moving, start it moving
+    						if ( !car.LeftWheel().isMoving() )
+    						{
+    							car.LeftWheel().startSynchronization();
+    							car.LeftWheel().backward();
+    							car.RightWheel().backward();
+    							car.LeftWheel().endSynchronization();
+    						}
     					}
     				}
     				
     				// Searches for right side of circle then rotates back
     				// to original direction
-    				if ( isFound && !rightSide )
+    				if ( isFound )
     				{
-    					if ( colorSample[0] != ColorId.BLACK.id ) // Found right side
-    					{
-    						rightSide = true;
-    						car.rotate( degreesTurned );
-    						color.fetchSample( colorSample, 0 ); // Update sensor data
-    					}
-    					else // Rotate right and store degrees
-    					{
-    						car.rotate( -2 );
-    						degreesTurned += 2;
-    						
-    						// Too far in black and can't determine center location
-    						if ( degreesTurned >= 200 )
+    					// Reset counts
+						car.LeftWheel().resetTachoCount();
+						car.RightWheel().resetTachoCount();
+						int degreesStart = car.LeftWheel().getTachoCount();
+						int degreesTurned = 0;
+						
+						// Start rotation
+						car.LeftWheel().startSynchronization();
+						car.LeftWheel().backward();
+						car.RightWheel().forward();
+						car.LeftWheel().endSynchronization();
+						
+						// Look for first edge of circle
+						do
+						{
+							color.fetchSample( colorSample, 0 );
+							
+							if ( colorSample[0] != ColorId.BLACK.id )
+							{
+								// Edge found get new start count
+								degreesStart = Math.abs( car.LeftWheel().getTachoCount() );
+								degreesTurned = 0;
+							}
+							else
+							{
+								// Edge not found, update turned count
+								degreesTurned = Math.abs( car.LeftWheel().getTachoCount() ) - degreesStart;
+								degreesTurned /= car.BaseToWheelRatio();
+							}
+						} while ( colorSample[0] == ColorId.BLACK.id && degreesTurned < 360 );
+						
+						if ( colorSample[0] != ColorId.BLACK.id ) // First edge found
+						{
+							Delay.msDelay( 10 ); // Slightly delay code because if sensor issues
+							
+							// Look for second edge of circle
+							do
     						{
-    							car.rotate( degreesTurned );
-    							break; // End program
-    						}
-    					}
-    				}
-    				
-    				// Searches for left side of circle then rotates to face center
-    				if ( isFound && rightSide && !leftSide )
-    				{
-    					if ( colorSample[0] != ColorId.BLACK.id ) // Found left side
-    					{
-    						leftSide = true;
-    						car.rotate( -degreesTurned / 2 ); // Rotate to center
-    						color.fetchSample( colorSample, 0 ); // Update sensor data
-    					}
-    					else // Rotate left and store degrees
-    					{
-    						car.rotate( 2 );
-    						degreesTurned += 2;
-    					}
-    				}
-    				
-    				// Move towards center
-    				if ( leftSide )
-    				{
-    					float distanceToCenter = 10.16f;
-    					
-    					// Amount to move is based on total degrees turned this
-    					// roughly estimates how close to the center the car already is.
-    					if ( degreesTurned > 180 )
-    					{
-    						distanceToCenter -= ((degreesTurned - 180) / 180 * 2) * 2.54;
-    					}
-    					
-    					car.moveForward( distanceToCenter );
-    					car.waiting();
-    					break; // End program
-    				}
-    				
-    				// Hasn't found circle, move forward
-    				if ( !isFound )
-    				{
-    					car.moveForward( MOVE_FORWARD_AMOUNT );
+								color.fetchSample( colorSample, 0 );
+								
+    							if ( colorSample[0] == ColorId.BLACK.id )
+    							{
+    								// Edge found, stop car
+    								car.LeftWheel().startSynchronization();
+        							car.LeftWheel().stop();
+        							car.RightWheel().stop();
+        							car.LeftWheel().endSynchronization();
+        							
+        							// Get final turned count
+    								degreesTurned = Math.abs( car.LeftWheel().getTachoCount() ) - degreesStart;
+    								degreesTurned /= car.BaseToWheelRatio();
+    								
+    								// Rotate to center
+    								car.rotate( -(360 - degreesTurned) / 2 );
+    							}
+    							else
+    							{
+    								// Edge not found, update turned count
+    								degreesTurned = Math.abs( car.LeftWheel().getTachoCount() ) - degreesStart;
+    								degreesTurned /= car.BaseToWheelRatio();
+    							}
+    						} while ( colorSample[0] != ColorId.BLACK.id && degreesTurned < 360 );
+							
+							if ( colorSample[0] == ColorId.BLACK.id ) // Second edge found
+							{
+	    						float distanceToCenter = 10.16f;
+	        					
+	        					// Amount to move is based on total degrees turned this
+	        					// roughly estimates how close to the center the car already is.
+	        					if ( 360 - degreesTurned > 180 )
+	        					{
+	        						distanceToCenter -= ((360 - degreesTurned - 180) / 180 * 2) * 2.54;
+	        					}
+	        					
+	        					car.moveForward( distanceToCenter );
+							}
+						}
+						else // No edge found
+						{
+							// Too far in black, stop car
+							car.LeftWheel().startSynchronization();
+							car.LeftWheel().stop();
+							car.RightWheel().stop();
+							car.LeftWheel().endSynchronization();
+						}
+						
+    					break;
     				}
     			}
     			
@@ -189,11 +228,7 @@ public class FindCircle
     				color.fetchSample( colorSample, 0 );
     				if ( colorSample[0] != ColorId.BLACK.id )
     				{
-    					isDistSensor = true; // stop checking for obstacles.
     					isFound = false;
-    					degreesTurned = 0;
-    					rightSide = false;
-    					leftSide = false;
     					break;
     				}
     			}
