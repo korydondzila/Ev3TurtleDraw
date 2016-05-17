@@ -4,7 +4,7 @@
  * Project:    LegoEv3
  * Date:       Apr 4, 2016, 1:10:14 PM
  * Purpose:    Ev3 car functions.
- * @author     Kory Dondzila, Garret Richardson, Theresa Horey
+ * @author     Kory Dondzila, Garret Richardson, Therese Horey
  * @version    "%I%, %G%"
  * Copyright:  2016
  */
@@ -30,8 +30,7 @@ public class Ev3Car implements AutoCloseable
 	protected RegulatedMotor rightWheel;
 	
 	/**
-	 * Base Constructor uses values based on original
-	 * Turtle car setup.
+	 * Base Constructor uses values based on original car setup.
 	 */
 	public Ev3Car()
 	{
@@ -39,7 +38,7 @@ public class Ev3Car implements AutoCloseable
 	}
 	
 	/**
-	 * Constructor initializes Turtle car to given specifications.
+	 * Constructor initializes car to given specifications.
 	 * @param wheelDiameter The diameter of wheels used.
 	 * @param wheelBase The distance between the centers of the two wheels.
 	 * @param leftWheelPort The left wheel's port.
@@ -68,6 +67,38 @@ public class Ev3Car implements AutoCloseable
 		rightWheel.close();
 	}
 	
+	/**
+	 * @return the direction
+	 */
+	public Point getDirection()
+	{
+		return this.direction;
+	}
+	
+	/**
+	 * @return the left wheel
+	 */
+	public RegulatedMotor LeftWheel()
+	{
+		return leftWheel;
+	}
+	
+	/**
+	 * @return the right wheel
+	 */
+	public RegulatedMotor RightWheel()
+	{
+		return rightWheel;
+	}
+	
+	/**
+	 * @return the base to wheel ratio
+	 */
+	public float BaseToWheelRatio()
+	{
+		return baseToWheelRatio;
+	}
+
 	/**
 	 * Sets the speed of the left wheel.
 	 * @param speed The speed in degrees / s.
@@ -205,7 +236,7 @@ public class Ev3Car implements AutoCloseable
 	/**
 	 * Waits until the motors stop moving.
 	 */
-	private void waiting()
+	public void waiting()
 	{
 		leftWheel.waitComplete();
 		rightWheel.waitComplete();
