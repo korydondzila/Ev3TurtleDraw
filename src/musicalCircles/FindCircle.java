@@ -13,6 +13,8 @@
 package musicalCircles;
 
 import java.util.Random;
+
+import lejos.hardware.Button;
 import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
 
@@ -48,7 +50,7 @@ public class FindCircle
 	static final double RETREAT_AMOUNT = 5.0;
 	
 	//the car will rotate until the sensor detects this distance in meters from an object
-	static final double WALL_DISTANCE = 0.2;
+	static final double WALL_DISTANCE = 0.1;
 
 	/**
 	 * @param args
@@ -58,8 +60,8 @@ public class FindCircle
 		try ( Ev3MusicalCircles car = new Ev3MusicalCircles() )
 		{
 			// Set wheel speed
-			car.setSpeedLeft( 360 );
-			car.setSpeedRight( 360 );
+			car.setSpeedLeft( 540 );
+			car.setSpeedRight( 540 );
 			
 			// Get SampleProviders and initialize sample srrays.
 			SampleProvider color = car.getColor();
@@ -70,6 +72,9 @@ public class FindCircle
 			// Initialize flags and counter
 			Random rand = new Random();
 			boolean isFound = false;
+			
+			// Wait for button press to start
+			Button.waitForAnyPress();
 			
 			while ( true )
 			{
@@ -137,6 +142,8 @@ public class FindCircle
 						car.RightWheel().resetTachoCount();
 						int degreesStart = car.LeftWheel().getTachoCount();
 						int degreesTurned = 0;
+						car.setSpeedLeft( 360 );
+						car.setSpeedRight( 360 );
 						
 						// Start rotation
 						car.LeftWheel().startSynchronization();
@@ -165,7 +172,7 @@ public class FindCircle
 						
 						if ( colorSample[0] != ColorId.BLACK.id ) // First edge found
 						{
-							Delay.msDelay( 10 ); // Slightly delay code because if sensor issues
+							Delay.msDelay( 50 ); // Slightly delay code because if sensor issues
 							
 							// Look for second edge of circle
 							do
@@ -197,7 +204,7 @@ public class FindCircle
 							
 							if ( colorSample[0] == ColorId.BLACK.id ) // Second edge found
 							{
-	    						float distanceToCenter = 10.16f;
+	    						float distanceToCenter = 7.62f;
 	        					
 	        					// Amount to move is based on total degrees turned this
 	        					// roughly estimates how close to the center the car already is.
@@ -229,6 +236,8 @@ public class FindCircle
     				if ( colorSample[0] != ColorId.BLACK.id )
     				{
     					isFound = false;
+    					car.setSpeedLeft( 540 );
+    					car.setSpeedRight( 540 );
     					break;
     				}
     			}
